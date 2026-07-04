@@ -14,4 +14,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FinTrack.Application\FinTrack.Application.csproj" />
+    <ProjectReference Include="..\FinTrack.Infrastructure\FinTrack.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
