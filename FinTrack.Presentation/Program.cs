@@ -1,4 +1,8 @@
+using FinTrack.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
+// Infrastructure katmanındaki tüm servisleri ve PostgreSQL ayarını tek satırda içeri alıyoruz
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Add services to the container.
 
