@@ -26,5 +26,18 @@ namespace FinTrack.Presentation.Controllers
 
             return Ok(new { message = "Kayıt işlemi başarıyla gerçekleştirildi." });
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+        {
+            var response = await _authService.LoginAsync(request);
+
+            if (response == null)
+            {
+                return Unauthorized(new { message = "E-posta veya şifre hatalı." });
+            }
+
+            return Ok(response);
+        }
     }
 }

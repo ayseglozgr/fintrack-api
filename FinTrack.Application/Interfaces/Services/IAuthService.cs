@@ -8,5 +8,6 @@ namespace FinTrack.Application.Interfaces.Services
     public interface IAuthService
     {
         Task<bool> RegisterAsync(RegisterRequestDto request);
+        Task<LoginResponseDto?> LoginAsync(LoginRequestDto request);
     }
 }

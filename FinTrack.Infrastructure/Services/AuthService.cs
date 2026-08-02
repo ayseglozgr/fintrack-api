@@ -42,5 +42,32 @@ namespace FinTrack.Infrastructure.Services
 
             return true;
         }
+
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+        {
+            // 1. Kullanıcı var mı kontrol et
+            var user = await _userRepository.GetByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return null; // Kullanıcı bulunamadı
+            }
+
+            // 2. Şifreyi doğrula
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+            if (result == PasswordVerificationResult.Failed)
+            {
+                return null; // Şifre yanlış
+            }
+
+            // 3. Şimdilik geçici bir token/başarı yanıtı dönüyoruz (JWT servisini entegre edeceğiz)
+            return new LoginResponseDto
+            {
+                Token = "DUMMY_JWT_TOKEN", // JWT yapısını kurduğumuzda buraya gerçek token gelecek
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+        }
+
     }
 }
