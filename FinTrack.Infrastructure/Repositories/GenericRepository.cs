@@ -35,21 +35,23 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public async Task AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
+        await _context.SaveChangesAsync(); // Fiziksel olarak DB'ye yazar
     }
 
-    public void Update(T entity)
+    public async Task UpdateAsync(T entity)
     {
         _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
     }
 
-    public void Delete(T entity)
+    public async Task DeleteAsync(T entity)
     {
-        // Soft Delete: Veriyi fiziksel olarak silmiyor, sadece işaretliyoruz
+        // Soft Delete: Veriyi fiziksel olarak silmiyor, işaretleyip güncelliyoruz
         entity.IsDeleted = true;
-        Update(entity);
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
     }
 
-    // Son yaptığımız konuşmaya istinaden eklediğimiz asenkron kaydetme metodu:
     public async Task<int> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync();

@@ -1,6 +1,8 @@
 ﻿using FinTrack.Application.Interfaces.Repositories;
+using FinTrack.Application.Interfaces.Services;
 using FinTrack.Infrastructure.Persistence;
 using FinTrack.Infrastructure.Repositories;
+using FinTrack.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,15 +13,23 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // 1. PostgreSQL DbContext Bağımlılığının Eklenmesi
-        // Bağlantı cümlesini (Connection String) API'deki appsettings.json'dan okuyacak
-        services.AddDbContext<FinTrackDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        string? envString = configuration["Environment"];
 
-        // 2. Repository Bağımlılıklarının (DI) Tanımlanması (Scoped asenkron süreçler için en doğrusudur)
+        Enum.TryParse<Domain.Const.Enum.Environment>(envString, true, out var currentEnvironment);
+
+        string? connectionString = configuration.GetConnectionString("ConnectionString_" + currentEnvironment.ToString())
+                                   ?? configuration.GetConnectionString("ConnectionString_TEST");
+
+        services.AddDbContext<FinTrackDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        //repositories
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IHouseholdRepository, HouseholdRepository>();
+
+        //services
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

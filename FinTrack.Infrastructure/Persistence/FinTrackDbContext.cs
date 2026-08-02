@@ -1,7 +1,6 @@
 ﻿using FinTrack.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-// BURAYI KONTROL ET: Tam olarak bu şekilde olmalı
 namespace FinTrack.Infrastructure.Persistence;
 
 public class FinTrackDbContext : DbContext
@@ -17,18 +16,20 @@ public class FinTrackDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Tablo isimlerini açıkça veritabanındaki isimlerle eşliyoruz (DB-First kuralı)
-        modelBuilder.Entity<User>().ToTable("Users");
-        modelBuilder.Entity<Household>().ToTable("Households");
+        // Tablo isimlerini açıkça veritabanındaki tekil isimlerle eşliyoruz
+        modelBuilder.Entity<User>().ToTable("User");
+        modelBuilder.Entity<Household>().ToTable("Household");
 
-        // Global Query Filter'larımız kalmaya devam ediyor
+        // Global Query Filter'larımız
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Household>().HasQueryFilter(h => !h.IsDeleted);
 
+        // Kullanıcının bir hanesi olmak zorunda değil (IsRequired(false))
         modelBuilder.Entity<Household>()
-            .HasMany(h => h.Users)
+            .HasMany(h => h.User)
             .WithOne(u => u.Household)
             .HasForeignKey(u => u.HouseholdId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
     }
 

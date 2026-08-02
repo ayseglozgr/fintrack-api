@@ -12,8 +12,8 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
 
     Task AddAsync(T entity);
-    void Update(T entity);
-    void Delete(T entity); // Soft-delete'i Infrastructure katmanında handle edeceğiz
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(T entity); // Soft-delete'i Infrastructure katmanında handle edeceğiz
 
     // Veritabanı kayıt işlemini doğrudan repository üzerinden asenkron tetiklemek için
     Task<int> SaveChangesAsync();

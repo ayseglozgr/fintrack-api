@@ -6,6 +6,6 @@ public class User : BaseEntity
     public string LastName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty; // Güvenlik için şifreyi açık tutmayacağız
-    public int HouseholdId { get; set; }
+    public int? HouseholdId { get; set; }
     public Household Household { get; set; } = null!;
 }

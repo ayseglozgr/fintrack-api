@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Folder Include="DTOs\Household\" />
-    <Folder Include="DTOs\User\" />
   </ItemGroup>
 
 </Project>
