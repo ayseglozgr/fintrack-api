@@ -10,8 +10,4 @@
     <ProjectReference Include="..\FinTrack.Domain\FinTrack.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\Household\" />
-  </ItemGroup>
-
 </Project>

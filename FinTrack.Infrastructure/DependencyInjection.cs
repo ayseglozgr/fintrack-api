@@ -1,5 +1,7 @@
-﻿using FinTrack.Application.Interfaces.Repositories;
+﻿using FinTrack.Application.Interfaces.Factories;
+using FinTrack.Application.Interfaces.Repositories;
 using FinTrack.Application.Interfaces.Services;
+using FinTrack.Infrastructure.Factories;
 using FinTrack.Infrastructure.Persistence;
 using FinTrack.Infrastructure.Repositories;
 using FinTrack.Infrastructure.Services;
@@ -30,6 +32,9 @@ public static class DependencyInjection
 
         //services
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserHouseHoldFactory, UserHouseHoldFactory>();
+        services.AddScoped<IHouseholdService, HouseholdService>();
 
         return services;
     }
