@@ -11,6 +11,7 @@ public class FinTrackDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Household> Households => Set<Household>();
+    public DbSet<FinancialAccount> FinancialAccounts => Set<FinancialAccount>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,10 +20,12 @@ public class FinTrackDbContext : DbContext
         // Tablo isimlerini açıkça veritabanındaki tekil isimlerle eşliyoruz
         modelBuilder.Entity<User>().ToTable("User");
         modelBuilder.Entity<Household>().ToTable("Household");
+        modelBuilder.Entity<FinancialAccount>().ToTable("FinancialAccount");
 
         // Global Query Filter'larımız
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Household>().HasQueryFilter(h => !h.IsDeleted);
+        modelBuilder.Entity<FinancialAccount>().HasQueryFilter(f => !f.IsDeleted);
 
         // Kullanıcının bir hanesi olmak zorunda değil (IsRequired(false))
         modelBuilder.Entity<Household>()

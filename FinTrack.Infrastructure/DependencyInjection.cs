@@ -29,12 +29,14 @@ public static class DependencyInjection
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IHouseholdRepository, HouseholdRepository>();
+        services.AddScoped<IFinancialAccountRepository, FinancialAccountRepository>();
 
         //services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserHouseHoldFactory, UserHouseHoldFactory>();
         services.AddScoped<IHouseholdService, HouseholdService>();
+        services.AddScoped<IFinancialAccountService, FinancialAccountService>();
 
         return services;
     }
