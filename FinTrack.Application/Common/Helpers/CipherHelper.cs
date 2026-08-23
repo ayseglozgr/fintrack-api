@@ -6,6 +6,7 @@ namespace FinTrack.Application.Common.Helpers;
 public static class CipherHelper
 {
     // Gerçek projede bu key ve iv değerleri appsettings.json içinde gizlenir.
+    //todo: burası yorumda belirtildiği gibi appsettings.json'dan okunacak şekilde güncellenmeli.
     // Şimdilik test amaçlı sabit 32 byte'lık bir anahtar ve 16 byte'lık IV tanımlıyoruz.
     private static readonly byte[] Key = Encoding.UTF8.GetBytes("FinTrackSecureKey32BytesLong123!");
     private static readonly byte[] Iv = Encoding.UTF8.GetBytes("FinTrackIV16Byte");

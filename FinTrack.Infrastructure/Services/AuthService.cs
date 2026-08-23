@@ -1,4 +1,5 @@
-﻿using FinTrack.Application.DTOs.User;
+﻿using FinTrack.Application.Common.Models;
+using FinTrack.Application.DTOs.User;
 using FinTrack.Application.Interfaces.Repositories;
 using FinTrack.Application.Interfaces.Services;
 using FinTrack.Domain.Entities;
@@ -9,64 +10,108 @@ namespace FinTrack.Infrastructure.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IJwtTokenService _jwtTokenService;
         private readonly PasswordHasher<User> _passwordHasher = new();
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(IUserRepository userRepository, IJwtTokenService jwtTokenService)
         {
             _userRepository = userRepository;
+            _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<bool> RegisterAsync(RegisterRequestDto request)
+        public async Task<ServiceResponse<LoginResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
-            // 1. Aynı email ile daha önce kayıt olunmuş mu kontrolü
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
-            if (existingUser != null)
+            string normalizedEmail = request.Email.Trim().ToLowerInvariant();
+            string normalizedAccountName = request.AccountName.Trim().ToLowerInvariant();
+
+            var existingUserByEmail = await _userRepository.GetByEmailAsync(normalizedEmail);
+            if (existingUserByEmail != null)
             {
-                return false; // Bu email zaten kayıtlı
+                return ServiceResponse<LoginResponseDto>.Failure("Email is already in use.");
             }
 
-            // 2. Yeni User nesnesini oluşturuyoruz
+            var existingUserByAccountName = await _userRepository.GetByAccountNameAsync(normalizedAccountName);
+            if (existingUserByAccountName != null)
+            {
+                return ServiceResponse<LoginResponseDto>.Failure("AccountName is already in use.");
+            }
+
             var user = new User
             {
+                AccountName = request.AccountName.Trim(),
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Email = request.Email,
-                //HouseholdId = request.HouseholdId
+                Email = normalizedEmail
             };
 
-            // 3. Şifreyi güvenli bir şekilde hash'liyoruz
             user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
-
-            // 4. Repository üzerinden ekleme ve kaydetme işlemi
             await _userRepository.AddAsync(user);
 
-            return true;
+            var tokenResponse = await CreateAndPersistTokensAsync(user);
+            return ServiceResponse<LoginResponseDto>.Success(tokenResponse, "Registration completed successfully.");
         }
 
-        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+        public async Task<ServiceResponse<LoginResponseDto>> LoginAsync(LoginRequestDto request)
         {
-            // 1. Kullanıcı var mı kontrol et
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var user = await _userRepository.GetByAccountNameOrEmailAsync(request.AccountNameOrEmail.Trim());
             if (user == null)
             {
-                return null; // Kullanıcı bulunamadı
+                return ServiceResponse<LoginResponseDto>.Failure("Invalid credentials.");
             }
 
-            // 2. Şifreyi doğrula
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
             if (result == PasswordVerificationResult.Failed)
             {
-                return null; // Şifre yanlış
+                return ServiceResponse<LoginResponseDto>.Failure("Invalid credentials.");
             }
 
-            // 3. Şimdilik geçici bir token/başarı yanıtı dönüyoruz (JWT servisini entegre edeceğiz)
-            return new LoginResponseDto
+            var tokenResponse = await CreateAndPersistTokensAsync(user);
+            return ServiceResponse<LoginResponseDto>.Success(tokenResponse, "Login successful.");
+        }
+
+        public async Task<ServiceResponse<LoginResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
             {
-                Token = "DUMMY_JWT_TOKEN", // JWT yapısını kurduğumuzda buraya gerçek token gelecek
+                return ServiceResponse<LoginResponseDto>.Failure("Refresh token is required.");
+            }
+
+            string tokenHash = _jwtTokenService.HashRefreshToken(request.RefreshToken.Trim());
+            var user = await _userRepository.GetByRefreshTokenHashAsync(tokenHash);
+
+            if (user == null || !user.RefreshTokenExpiresAtUtc.HasValue || user.RefreshTokenExpiresAtUtc.Value <= DateTime.UtcNow)
+            {
+                return ServiceResponse<LoginResponseDto>.Failure("Invalid or expired refresh token.");
+            }
+
+            var tokenResponse = await CreateAndPersistTokensAsync(user);
+            return ServiceResponse<LoginResponseDto>.Success(tokenResponse, "Token refreshed successfully.");
+        }
+
+        private async Task<LoginResponseDto> CreateAndPersistTokensAsync(User user)
+        {
+            var accessTokenExpiresAtUtc = _jwtTokenService.GetAccessTokenExpiresAtUtc();
+            var accessToken = _jwtTokenService.GenerateAccessToken(user, accessTokenExpiresAtUtc);
+            var refreshToken = _jwtTokenService.GenerateRefreshToken();
+            var refreshTokenHash = _jwtTokenService.HashRefreshToken(refreshToken);
+            var refreshTokenExpiresAtUtc = _jwtTokenService.GetRefreshTokenExpiresAtUtc();
+
+            user.RefreshTokenHash = refreshTokenHash;
+            user.RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc;
+            await _userRepository.UpdateAsync(user);
+
+            var response = new LoginResponseDto
+            {
+                UserId = user.Id,
+                AccountName = user.AccountName,
                 Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName
+                AccessToken = accessToken,
+                AccessTokenExpiresAtUtc = accessTokenExpiresAtUtc,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc
             };
+
+            return response;
         }
 
     }

@@ -33,6 +33,7 @@ public static class DependencyInjection
 
         //services
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserHouseHoldFactory, UserHouseHoldFactory>();
         services.AddScoped<IHouseholdService, HouseholdService>();

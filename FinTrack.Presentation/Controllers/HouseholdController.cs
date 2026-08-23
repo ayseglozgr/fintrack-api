@@ -1,5 +1,6 @@
 using FinTrack.Application.DTOs.Household;
 using FinTrack.Application.Interfaces.Factories;
+using FinTrack.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinTrack.Presentation.Controllers
@@ -9,28 +10,36 @@ namespace FinTrack.Presentation.Controllers
     public class HouseholdController : ControllerBase
     {
         private readonly IUserHouseHoldFactory _userHouseHoldFactory;
+        private readonly IHouseholdService _householdService;
 
-        public HouseholdController(IUserHouseHoldFactory userHouseHoldFactory)
+        public HouseholdController(IUserHouseHoldFactory userHouseHoldFactory, IHouseholdService householdService)
         {
             _userHouseHoldFactory = userHouseHoldFactory;
+            _householdService = householdService;
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateHouseholdDto request)
         {
-            try
+            var response = await _userHouseHoldFactory.CreateHouseholdForUserAsync(request);
+            if (!response.IsSuccess || response.Data == null)
             {
-                var household = await _userHouseHoldFactory.CreateHouseholdForUserAsync(request);
-                return Ok(household);
+                return BadRequest(response);
             }
-            catch (ArgumentException ex)
+
+            return Ok(response);
+        }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateHouseholdDto request)
+        {
+            var response = await _householdService.UpdateHouseholdAsync(request);
+            if (!response.IsSuccess)
             {
-                return BadRequest(new { message = ex.Message });
+                return NotFound(response);
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+
+            return Ok(response);
         }
     }
 }

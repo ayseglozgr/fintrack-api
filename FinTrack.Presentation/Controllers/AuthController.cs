@@ -1,5 +1,6 @@
 ﻿using FinTrack.Application.DTOs.User;
 using FinTrack.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinTrack.Presentation.Controllers
@@ -16,25 +17,40 @@ namespace FinTrack.Presentation.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             var result = await _authService.RegisterAsync(request);
-            if (!result)
+            if (!result.IsSuccess)
             {
-                return BadRequest(new { message = "Bu e-posta adresi ile zaten bir kayıt bulunuyor." });
+                return BadRequest(result);
             }
 
-            return Ok(new { message = "Kayıt işlemi başarıyla gerçekleştirildi." });
+            return Ok(result);
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             var response = await _authService.LoginAsync(request);
 
-            if (response == null)
+            if (!response.IsSuccess)
             {
-                return Unauthorized(new { message = "E-posta veya şifre hatalı." });
+                return Unauthorized(response);
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
+        {
+            var response = await _authService.RefreshTokenAsync(request);
+            if (!response.IsSuccess)
+            {
+                return Unauthorized(response);
             }
 
             return Ok(response);

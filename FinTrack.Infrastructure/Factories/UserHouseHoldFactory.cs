@@ -1,6 +1,7 @@
+using FinTrack.Application.Common.Models;
+using FinTrack.Application.DTOs.Household;
 using FinTrack.Application.Interfaces.Factories;
 using FinTrack.Application.Interfaces.Services;
-using FinTrack.Application.DTOs.Household;
 
 namespace FinTrack.Infrastructure.Factories;
 
@@ -15,22 +16,33 @@ public class UserHouseHoldFactory : IUserHouseHoldFactory
         _userService = userService;
     }
 
-    public async Task<HouseholdDto> CreateHouseholdForUserAsync(CreateHouseholdDto createHouseholdDto)
+    public async Task<ServiceResponse<HouseholdDto>> CreateHouseholdForUserAsync(CreateHouseholdDto createHouseholdDto)
     {
+        if (createHouseholdDto == null)
+        {
+            return ServiceResponse<HouseholdDto>.Failure("Household payload is required.");
+        }
+
         var userExists = await _userService.UserExistsAsync(createHouseholdDto.UserId);
         if (!userExists)
         {
-            throw new InvalidOperationException($"User not found. UserId: {createHouseholdDto.UserId}");
+            return ServiceResponse<HouseholdDto>.Failure($"User not found. UserId: {createHouseholdDto.UserId}");
         }
 
-        var household = await _householdService.CreateHouseholdAsync(createHouseholdDto);
+        var householdResponse = await _householdService.CreateHouseholdAsync(createHouseholdDto);
+        if (!householdResponse.IsSuccess || householdResponse.Data == null)
+        {
+            return ServiceResponse<HouseholdDto>.Failure(
+                householdResponse.Message,
+                householdResponse.Errors);
+        }
 
-        var isAssigned = await _userService.AssignHouseholdAsync(createHouseholdDto.UserId, household.Id);
+        var isAssigned = await _userService.AssignHouseholdAsync(createHouseholdDto.UserId, householdResponse.Data.Id);
         if (!isAssigned)
         {
-            throw new InvalidOperationException("User-household assignment failed.");
+            return ServiceResponse<HouseholdDto>.Failure("User-household assignment failed.");
         }
 
-        return household;
+        return householdResponse;
     }
 }

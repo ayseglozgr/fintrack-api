@@ -11,10 +11,29 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
     }
 
-    // Kullanıcı e-posta kontrolü için asenkron metot
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _context.Users
             .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+    }
+
+    public async Task<User?> GetByAccountNameAsync(string accountName)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.AccountName.ToLower() == accountName.ToLower());
+    }
+
+    public async Task<User?> GetByAccountNameOrEmailAsync(string accountNameOrEmail)
+    {
+        var normalized = accountNameOrEmail.ToLower();
+
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == normalized || u.AccountName.ToLower() == normalized);
+    }
+
+    public async Task<User?> GetByRefreshTokenHashAsync(string refreshTokenHash)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.RefreshTokenHash == refreshTokenHash);
     }
 }

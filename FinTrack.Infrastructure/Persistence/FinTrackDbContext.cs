@@ -22,6 +22,32 @@ public class FinTrackDbContext : DbContext
         modelBuilder.Entity<Household>().ToTable("Household");
         modelBuilder.Entity<FinancialAccount>().ToTable("FinancialAccount");
 
+        modelBuilder.Entity<User>()
+            .Property(u => u.AccountName)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Email)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.PasswordHash)
+            .IsRequired();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.RefreshTokenHash)
+            .HasMaxLength(128);
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.AccountName)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
         // Global Query Filter'larımız
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Household>().HasQueryFilter(h => !h.IsDeleted);
