@@ -1,4 +1,5 @@
-﻿using FinTrack.Application.Common.Models;
+﻿using FinTrack.Application.Common.Helpers;
+using FinTrack.Application.Common.Models;
 using FinTrack.Application.DTOs.Household;
 using FinTrack.Application.Interfaces.Repositories;
 using FinTrack.Application.Interfaces.Services;
@@ -36,7 +37,7 @@ namespace FinTrack.Infrastructure.Services
 
             return ServiceResponse<HouseholdDto>.Success(new HouseholdDto
             {
-                Id = household.Id,
+                Uid = CipherHelper.EncryptId(household.Id),
                 Name = household.Name,
                 CreateDate = household.CreateDate
             }, "Household created successfully.");
@@ -54,10 +55,16 @@ namespace FinTrack.Infrastructure.Services
                 return ServiceResponse<HouseholdDto>.Failure("Household name is required.");
             }
 
-            var household = await _householdRepository.GetByIdAsync(updateHouseholdDto.Id);
+            var id = CipherHelper.DecryptId(updateHouseholdDto.Uid);
+            if (id <= 0)
+            {
+                return ServiceResponse<HouseholdDto>.Failure("Invalid encrypted id.");
+            }
+
+            var household = await _householdRepository.GetByIdAsync(id);
             if (household == null || household.IsDeleted)
             {
-                return ServiceResponse<HouseholdDto>.Failure($"Household not found. Id: {updateHouseholdDto.Id}");
+                return ServiceResponse<HouseholdDto>.Failure($"Household not found. Id: {id}");
             }
 
             household.Name = updateHouseholdDto.Name.Trim();
@@ -68,7 +75,7 @@ namespace FinTrack.Infrastructure.Services
 
             return ServiceResponse<HouseholdDto>.Success(new HouseholdDto
             {
-                Id = household.Id,
+                Uid = CipherHelper.EncryptId(household.Id),
                 Name = household.Name,
                 CreateDate = household.CreateDate
             }, "Household updated successfully.");

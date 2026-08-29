@@ -5,8 +5,8 @@ namespace FinTrack.Application.DTOs.FinancialAccount;
 
 public class CreateFinancialAccountRequestDto
 {
-    [Range(1, int.MaxValue, ErrorMessage = "UserId must be greater than 0.")]
-    public int UserId { get; set; }
+    [Required]
+    public string UserUid { get; set; } = string.Empty;
 
     [Range(1, 3, ErrorMessage = "Type must be a valid FinancialAccountType value.")]
     public FinancialAccountType Type { get; set; }

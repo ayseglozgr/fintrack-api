@@ -55,9 +55,15 @@ public class FinancialAccountService : IFinancialAccountService
             return ServiceResponse<FinancialAccountGetDto>.Failure("Financial account payload is required.");
         }
 
+        var userId = CipherHelper.DecryptId(request.UserUid);
+        if (userId <= 0)
+        {
+            return ServiceResponse<FinancialAccountGetDto>.Failure("Invalid encrypted id.");
+        }
+
         var financialAccount = new FinancialAccount
         {
-            UserId = request.UserId,
+            UserId = userId,
             Type = request.Type,
             ProviderName = request.ProviderName,
             Alias = request.Alias,
@@ -126,7 +132,7 @@ public class FinancialAccountService : IFinancialAccountService
         return new FinancialAccountGetDto
         {
             Uid = CipherHelper.EncryptId(financialAccount.Id),
-            UserId = financialAccount.UserId,
+            UserUid = CipherHelper.EncryptId(financialAccount.UserId),
             Type = (int)financialAccount.Type,
             TypeDescriptionTr = financialAccount.Type.GetDescription(),
             ProviderName = financialAccount.ProviderName,

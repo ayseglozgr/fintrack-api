@@ -8,9 +8,6 @@ public class UpdateFinancialAccountRequestDto
     [Required]
     public string Uid { get; set; } = string.Empty;
 
-    [Range(1, int.MaxValue, ErrorMessage = "UserId must be greater than 0.")]
-    public int UserId { get; set; }
-
     [Range(1, 3, ErrorMessage = "Type must be a valid FinancialAccountType value.")]
     public FinancialAccountType Type { get; set; }
 

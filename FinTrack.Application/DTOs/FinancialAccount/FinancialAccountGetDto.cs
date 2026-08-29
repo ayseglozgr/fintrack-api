@@ -3,7 +3,7 @@ namespace FinTrack.Application.DTOs.FinancialAccount;
 public class FinancialAccountGetDto
 {
     public string Uid { get; set; } = string.Empty;
-    public int UserId { get; set; }
+    public string UserUid { get; set; } = string.Empty;
     public int Type { get; set; }
     public string TypeDescriptionTr { get; set; } = string.Empty;
     public string ProviderName { get; set; } = string.Empty;

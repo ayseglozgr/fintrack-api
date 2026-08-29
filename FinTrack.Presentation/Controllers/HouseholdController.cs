@@ -1,3 +1,5 @@
+using FinTrack.Application.Common.Helpers;
+using FinTrack.Application.Common.Models;
 using FinTrack.Application.DTOs.Household;
 using FinTrack.Application.Interfaces.Factories;
 using FinTrack.Application.Interfaces.Services;
@@ -47,9 +49,15 @@ namespace FinTrack.Presentation.Controllers
             return Ok(response);
         }
 
-        [HttpGet("user/{userId:int}")]
-        public async Task<IActionResult> GetUserHouseholds(int userId)
+        [HttpGet("user/{userUid}")]
+        public async Task<IActionResult> GetUserHouseholds(string userUid)
         {
+            var userId = CipherHelper.DecryptId(userUid);
+            if (userId <= 0)
+            {
+                return BadRequest(ServiceResponse<object>.Failure("Invalid encrypted id."));
+            }
+
             var response = await _userService.GetUserHouseholdsAsync(userId);
             if (!response.IsSuccess)
             {
@@ -62,7 +70,14 @@ namespace FinTrack.Presentation.Controllers
         [HttpPut("select-active")]
         public async Task<IActionResult> SelectActive([FromBody] SelectActiveHouseholdRequestDto request)
         {
-            var response = await _userService.SwitchActiveHouseholdAsync(request.UserId, request.HouseholdId);
+            var userId = CipherHelper.DecryptId(request.UserUid);
+            var householdId = CipherHelper.DecryptId(request.HouseholdUid);
+            if (userId <= 0 || householdId <= 0)
+            {
+                return BadRequest(ServiceResponse<object>.Failure("Invalid encrypted id."));
+            }
+
+            var response = await _userService.SwitchActiveHouseholdAsync(userId, householdId);
             if (!response.IsSuccess)
             {
                 return BadRequest(response);

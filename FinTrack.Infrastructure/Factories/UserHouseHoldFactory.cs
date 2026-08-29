@@ -1,3 +1,4 @@
+using FinTrack.Application.Common.Helpers;
 using FinTrack.Application.Common.Models;
 using FinTrack.Application.DTOs.Household;
 using FinTrack.Application.Interfaces.Factories;
@@ -23,10 +24,16 @@ public class UserHouseHoldFactory : IUserHouseHoldFactory
             return ServiceResponse<HouseholdDto>.Failure("Household payload is required.");
         }
 
-        var userExists = await _userService.UserExistsAsync(createHouseholdDto.UserId);
+        var userId = CipherHelper.DecryptId(createHouseholdDto.UserUid);
+        if (userId <= 0)
+        {
+            return ServiceResponse<HouseholdDto>.Failure("Invalid encrypted id.");
+        }
+
+        var userExists = await _userService.UserExistsAsync(userId);
         if (!userExists)
         {
-            return ServiceResponse<HouseholdDto>.Failure($"User not found. UserId: {createHouseholdDto.UserId}");
+            return ServiceResponse<HouseholdDto>.Failure($"User not found. UserId: {userId}");
         }
 
         var householdResponse = await _householdService.CreateHouseholdAsync(createHouseholdDto);
@@ -37,9 +44,10 @@ public class UserHouseHoldFactory : IUserHouseHoldFactory
                 householdResponse.Errors);
         }
 
+        var householdId = CipherHelper.DecryptId(householdResponse.Data.Uid);
         var isAssigned = await _userService.AddMembershipAsync(
-            createHouseholdDto.UserId,
-            householdResponse.Data.Id,
+            userId,
+            householdId,
             setAsActive: true);
         if (!isAssigned)
         {

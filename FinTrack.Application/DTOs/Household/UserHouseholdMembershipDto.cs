@@ -2,8 +2,8 @@ namespace FinTrack.Application.DTOs.Household;
 
 public class UserHouseholdMembershipDto
 {
-    public int UserId { get; set; }
-    public int HouseholdId { get; set; }
+    public string UserUid { get; set; } = string.Empty;
+    public string HouseholdUid { get; set; } = string.Empty;
     public string HouseholdName { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public DateTime JoinedAt { get; set; }

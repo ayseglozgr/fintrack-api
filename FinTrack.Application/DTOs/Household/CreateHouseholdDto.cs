@@ -10,7 +10,7 @@ namespace FinTrack.Application.DTOs.Household
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        [Range(1, int.MaxValue, ErrorMessage = "UserId must be greater than 0.")]
-        public int UserId { get; set; } // Haneyi oluşturan kullanıcının ID'si
+        [Required]
+        public string UserUid { get; set; } = string.Empty; // Haneyi oluşturan kullanıcının şifreli ID'si
     }
 }

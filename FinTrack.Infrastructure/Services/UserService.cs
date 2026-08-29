@@ -1,3 +1,4 @@
+using FinTrack.Application.Common.Helpers;
 using FinTrack.Application.Common.Models;
 using FinTrack.Application.DTOs.Household;
 using FinTrack.Application.Interfaces.Repositories;
@@ -93,8 +94,8 @@ public class UserService : IUserService
 
         var mapped = memberships.Select(uh => new UserHouseholdMembershipDto
         {
-            UserId = uh.UserId,
-            HouseholdId = uh.HouseholdId,
+            UserUid = CipherHelper.EncryptId(uh.UserId),
+            HouseholdUid = CipherHelper.EncryptId(uh.HouseholdId),
             HouseholdName = uh.Household.Name,
             IsActive = uh.IsActive,
             JoinedAt = uh.JoinedAt,

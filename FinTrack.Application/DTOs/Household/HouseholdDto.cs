@@ -6,7 +6,7 @@ namespace FinTrack.Application.DTOs.Household
 {
     public class HouseholdDto
     {
-        public int Id { get; set; }
+        public string Uid { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public DateTime CreateDate { get; set; }
     }
