@@ -57,6 +57,15 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .Build();
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FinTrackFrontend", policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -81,6 +90,8 @@ if (app.Environment.IsDevelopment())
         await Task.CompletedTask;
     }).AllowAnonymous();
 }
+
+app.UseCors("FinTrackFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
