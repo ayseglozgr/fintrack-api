@@ -1,6 +1,228 @@
 @FinTrack.Presentation_HostAddress = http://localhost:5258
+@UserHouseholdUid = REPLACE_USER_HOUSEHOLD_UID
+@FinancialAccountUid = REPLACE_FINANCIAL_ACCOUNT_UID
+@CategoryUid = REPLACE_CATEGORY_UID
+@ParentCategoryUid = REPLACE_PARENT_CATEGORY_UID
+@LedgerTransactionUid = REPLACE_LEDGER_TRANSACTION_UID
+@InstallmentPlanUid = REPLACE_INSTALLMENT_PLAN_UID
+@ProxyCaseUid = REPLACE_PROXY_CASE_UID
 
-GET {{FinTrack.Presentation_HostAddress}}/weatherforecast/
+# ==========================================
+# CATEGORY
+# ==========================================
+
+GET {{FinTrack.Presentation_HostAddress}}/api/Category/get-all
+Accept: application/json
+
+###
+
+GET {{FinTrack.Presentation_HostAddress}}/api/Category/get-by-id/{{CategoryUid}}
+Accept: application/json
+
+###
+
+POST {{FinTrack.Presentation_HostAddress}}/api/Category/create
+Content-Type: application/json
+
+{
+  "householdUid": null,
+  "name": "Market",
+  "parentCategoryUid": null,
+  "direction": 2,
+  "isActive": true
+}
+
+###
+
+PUT {{FinTrack.Presentation_HostAddress}}/api/Category/update
+Content-Type: application/json
+
+{
+  "uid": "{{CategoryUid}}",
+  "householdUid": null,
+  "name": "Market - Gıda",
+  "parentCategoryUid": "{{ParentCategoryUid}}",
+  "direction": 2,
+  "isActive": true
+}
+
+###
+
+DELETE {{FinTrack.Presentation_HostAddress}}/api/Category/delete/{{CategoryUid}}
+Accept: application/json
+
+###
+
+# ==========================================
+# LEDGER TRANSACTION
+# ==========================================
+
+GET {{FinTrack.Presentation_HostAddress}}/api/LedgerTransaction/get-all
+Accept: application/json
+
+###
+
+GET {{FinTrack.Presentation_HostAddress}}/api/LedgerTransaction/get-by-id/{{LedgerTransactionUid}}
+Accept: application/json
+
+###
+
+POST {{FinTrack.Presentation_HostAddress}}/api/LedgerTransaction/create
+Content-Type: application/json
+
+{
+  "userHouseholdUid": "{{UserHouseholdUid}}",
+  "financialAccountUid": "{{FinancialAccountUid}}",
+  "categoryUid": "{{CategoryUid}}",
+  "transactionDate": "2026-01-10T00:00:00Z",
+  "amount": 2500.00,
+  "transactionType": 2,
+  "paymentChannel": 3,
+  "entryState": 1,
+  "expenseKind": 1,
+  "isBudgetNeutral": false,
+  "description": "Aylık market harcaması"
+}
+
+###
+
+PUT {{FinTrack.Presentation_HostAddress}}/api/LedgerTransaction/update
+Content-Type: application/json
+
+{
+  "uid": "{{LedgerTransactionUid}}",
+  "userHouseholdUid": "{{UserHouseholdUid}}",
+  "financialAccountUid": "{{FinancialAccountUid}}",
+  "categoryUid": "{{CategoryUid}}",
+  "transactionDate": "2026-01-11T00:00:00Z",
+  "amount": 2750.00,
+  "transactionType": 2,
+  "paymentChannel": 3,
+  "entryState": 1,
+  "expenseKind": 1,
+  "isBudgetNeutral": false,
+  "description": "Düzeltilmiş market harcaması"
+}
+
+###
+
+DELETE {{FinTrack.Presentation_HostAddress}}/api/LedgerTransaction/delete/{{LedgerTransactionUid}}
+Accept: application/json
+
+###
+
+# ==========================================
+# INSTALLMENT
+# ==========================================
+
+GET {{FinTrack.Presentation_HostAddress}}/api/Installment/get-all
+Accept: application/json
+
+###
+
+GET {{FinTrack.Presentation_HostAddress}}/api/Installment/get-by-id/{{InstallmentPlanUid}}
+Accept: application/json
+
+###
+
+GET {{FinTrack.Presentation_HostAddress}}/api/Installment/get-schedules/{{InstallmentPlanUid}}
+Accept: application/json
+
+###
+
+POST {{FinTrack.Presentation_HostAddress}}/api/Installment/create
+Content-Type: application/json
+
+{
+  "userHouseholdUid": "{{UserHouseholdUid}}",
+  "financialAccountUid": "{{FinancialAccountUid}}",
+  "categoryUid": "{{CategoryUid}}",
+  "purchaseDate": "2026-02-05T00:00:00Z",
+  "totalAmount": 12000.00,
+  "installmentCount": 3,
+  "firstDueDate": "2026-02-20T00:00:00Z",
+  "merchantName": "Teknoloji Mağazası",
+  "description": "Kulaklık alımı",
+  "paymentChannel": 3,
+  "entryState": 2
+}
+
+###
+
+PUT {{FinTrack.Presentation_HostAddress}}/api/Installment/update
+Content-Type: application/json
+
+{
+  "installmentPlanUid": "{{InstallmentPlanUid}}",
+  "userHouseholdUid": "{{UserHouseholdUid}}",
+  "financialAccountUid": "{{FinancialAccountUid}}",
+  "categoryUid": "{{CategoryUid}}",
+  "purchaseDate": "2026-02-05T00:00:00Z",
+  "totalAmount": 15000.00,
+  "installmentCount": 5,
+  "firstDueDate": "2026-02-20T00:00:00Z",
+  "merchantName": "Teknoloji Mağazası",
+  "description": "Tutar ve taksit adedi güncellendi",
+  "paymentChannel": 3,
+  "entryState": 2
+}
+
+###
+
+DELETE {{FinTrack.Presentation_HostAddress}}/api/Installment/delete/{{InstallmentPlanUid}}
+Accept: application/json
+
+###
+
+# ==========================================
+# PROXY TRANSACTIONS
+# ==========================================
+
+GET {{FinTrack.Presentation_HostAddress}}/api/ProxyTransactions/get-all
+Accept: application/json
+
+###
+
+GET {{FinTrack.Presentation_HostAddress}}/api/ProxyTransactions/get-by-id/{{ProxyCaseUid}}
+Accept: application/json
+
+###
+
+GET {{FinTrack.Presentation_HostAddress}}/api/ProxyTransactions/get-settlements/{{ProxyCaseUid}}
+Accept: application/json
+
+###
+
+POST {{FinTrack.Presentation_HostAddress}}/api/ProxyTransactions/start
+Content-Type: application/json
+
+{
+  "userHouseholdUid": "{{UserHouseholdUid}}",
+  "financialAccountUid": "{{FinancialAccountUid}}",
+  "externalPartyName": "Zeynep",
+  "spentDate": "2026-02-12T00:00:00Z",
+  "totalAdvancedAmount": 1800.00,
+  "description": "Arkadaş için yapılan emanet harcama"
+}
+
+###
+
+POST {{FinTrack.Presentation_HostAddress}}/api/ProxyTransactions/close
+Content-Type: application/json
+
+{
+  "proxyCaseUid": "{{ProxyCaseUid}}",
+  "settlementDate": "2026-02-20T00:00:00Z",
+  "amount": 900.00,
+  "paymentChannel": 1,
+  "entryState": 1,
+  "receivedFinancialAccountUid": "{{FinancialAccountUid}}",
+  "note": "İlk kısmi tahsilat"
+}
+
+###
+
+DELETE {{FinTrack.Presentation_HostAddress}}/api/ProxyTransactions/delete/{{ProxyCaseUid}}
 Accept: application/json
 
 ###
