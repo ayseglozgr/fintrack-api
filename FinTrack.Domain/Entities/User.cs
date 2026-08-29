@@ -9,6 +9,6 @@ public class User : BaseEntity
     public string PasswordHash { get; set; } = string.Empty; // Güvenlik için şifreyi açık tutmayacağız
     public string? RefreshTokenHash { get; set; }
     public DateTime? RefreshTokenExpiresAtUtc { get; set; }
-    public int? HouseholdId { get; set; }
-    public Household Household { get; set; } = null!;
+    public ICollection<FinancialAccount> FinancialAccounts { get; set; } = new List<FinancialAccount>();
+    public ICollection<UserHousehold> UserHouseholds { get; set; } = new List<UserHousehold>();
 }

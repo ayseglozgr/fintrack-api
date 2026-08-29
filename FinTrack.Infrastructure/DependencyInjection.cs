@@ -29,7 +29,14 @@ public static class DependencyInjection
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IHouseholdRepository, HouseholdRepository>();
+        services.AddScoped<IUserHouseholdRepository, UserHouseholdRepository>();
         services.AddScoped<IFinancialAccountRepository, FinancialAccountRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ILedgerTransactionRepository, LedgerTransactionRepository>();
+        services.AddScoped<IInstallmentPlanRepository, InstallmentPlanRepository>();
+        services.AddScoped<IInstallmentScheduleRepository, InstallmentScheduleRepository>();
+        services.AddScoped<IProxyCaseRepository, ProxyCaseRepository>();
+        services.AddScoped<IProxySettlementRepository, ProxySettlementRepository>();
 
         //services
         services.AddScoped<IAuthService, AuthService>();
@@ -38,6 +45,12 @@ public static class DependencyInjection
         services.AddScoped<IUserHouseHoldFactory, UserHouseHoldFactory>();
         services.AddScoped<IHouseholdService, HouseholdService>();
         services.AddScoped<IFinancialAccountService, FinancialAccountService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<ILedgerTransactionService, LedgerTransactionService>();
+        services.AddScoped<IInstallmentPlanService, InstallmentPlanService>();
+        services.AddScoped<IInstallmentScheduleService, InstallmentScheduleService>();
+        services.AddScoped<IProxyCaseService, ProxyCaseService>();
+        services.AddScoped<IProxySettlementService, ProxySettlementService>();
 
         return services;
     }

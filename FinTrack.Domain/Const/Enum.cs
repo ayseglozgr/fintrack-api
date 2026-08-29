@@ -54,6 +54,35 @@ namespace FinTrack.Domain.Const
             MealOrTicketCard = 3
         }
 
+        public enum AccountType
+        {
+            CreditCard = 1,
+            BankAccount = 2,
+            MealCard = 3
+        }
+
+        public enum TransactionType
+        {
+            Income = 1,
+            Expense = 2,
+            Transfer = 3
+        }
+
+        public enum StatusType
+        {
+            DraftProjected = 1,
+            Actual = 2,
+            Cancelled = 3
+        }
+
+        public enum SettlementStatus
+        {
+            Open = 1,
+            PartiallySettled = 2,
+            Settled = 3,
+            WrittenOff = 4
+        }
+
         public enum ExpenseKind
         {
             Normal = 1,

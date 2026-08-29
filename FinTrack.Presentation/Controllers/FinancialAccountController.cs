@@ -5,7 +5,7 @@ using static FinTrack.Domain.Const.Enum;
 
 namespace FinTrack.Presentation.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/financialAccount")]
 [ApiController]
 public class FinancialAccountController : ControllerBase
 {

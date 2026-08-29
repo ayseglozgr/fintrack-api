@@ -37,7 +37,10 @@ public class UserHouseHoldFactory : IUserHouseHoldFactory
                 householdResponse.Errors);
         }
 
-        var isAssigned = await _userService.AssignHouseholdAsync(createHouseholdDto.UserId, householdResponse.Data.Id);
+        var isAssigned = await _userService.AddMembershipAsync(
+            createHouseholdDto.UserId,
+            householdResponse.Data.Id,
+            setAsActive: true);
         if (!isAssigned)
         {
             return ServiceResponse<HouseholdDto>.Failure("User-household assignment failed.");
